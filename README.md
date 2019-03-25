@@ -80,6 +80,51 @@ end
 
 
 
+## Uploading Images to Amazon S3
+
+For this assignment you will need an Amazon S3 account.
+
+Here is an example of how you accept an image and upload it to S3 and get the public URL.
+
+
+
+Example:
+
+```ruby
+require "sinatra"
+require "fog"
+
+connection = Fog::Storage.new({
+:provider                 => 'AWS',
+:aws_access_key_id        => 'youraccesskey',
+:aws_secret_access_key    => 'yoursecretaccesskey'
+})
+
+post "/api/upload" do
+    if params[:image] && params[:image][:tempfile] && params[:image][:filename]
+        begin
+			file       = params[:image][:tempfile]
+			filename   = params[:image][:filename]
+			directory = connection.directories.create(
+				:key    => "fog-demo-#{Time.now.to_i}", # globally unique name
+				:public => true
+			)
+			file2 = directory.files.create(
+				:key    => filename,
+				:body   => file,
+				:public => true
+			  )
+			url = file2.public_url
+            halt 200, {message: "Uploaded Image to #{url}"}.to_json
+        rescue
+            halt 422, {message: "Unable to Upload Image"}.to_json
+        end
+    end
+end
+```
+
+
+
 ## Part 0 - Getting Started
 
 Part 0 should work out of the box. These tests make sure that you have all the prerequisites to begin the assignment. The tests are related to API authentication, which is provided for you.
