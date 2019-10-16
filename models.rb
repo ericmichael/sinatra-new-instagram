@@ -31,10 +31,6 @@ class User
     def login(password)
     	return self.password == password
     end
-
-    def as_json(*)
-       super.except(:role_id)
-    end
 end
 
 class Post
