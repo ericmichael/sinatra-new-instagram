@@ -24,20 +24,14 @@ The goal in this assignment is to learn how to make a modern social network usin
 
 
 ## Running the Application
-1. Install the rerun gem: `gem install rerun`
-
-2. ```
-   rerun 'bundle exec ruby app.rb'
-   ```
+1.  'bundle exec ruby app.rb' 
    
 
 
 
 ## What is in the box
-
-1. Authentication System: "/api/login" and "/api/register"
-
-2. User model
+1. User model
+2. API Authentication
 
 
 ## Protecting pages from non-signed in users
@@ -77,52 +71,6 @@ get '/say_hello' do
     end
 end
 ```
-
-
-
-## Uploading Images to Amazon S3
-
-For this assignment you will need an Amazon S3 account.
-
-Here is an example of how you accept an image and upload it to S3 and get the public URL.
-
-
-
-Example:
-
-```ruby
-require "sinatra"
-require "fog"
-
-connection = Fog::Storage.new({
-:provider                 => 'AWS',
-:aws_access_key_id        => 'youraccesskey',
-:aws_secret_access_key    => 'yoursecretaccesskey'
-})
-
-post "/api/upload" do
-    if params[:image] && params[:image][:tempfile] && params[:image][:filename]
-        begin
-			file       = params[:image][:tempfile]
-			filename   = params[:image][:filename]
-			directory = connection.directories.create(
-				:key    => "fog-demo-#{Time.now.to_i}", # globally unique name
-				:public => true
-			)
-			file2 = directory.files.create(
-				:key    => filename,
-				:body   => file,
-				:public => true
-			  )
-			url = file2.public_url
-            halt 200, {message: "Uploaded Image to #{url}"}.to_json
-        rescue
-            halt 422, {message: "Unable to Upload Image"}.to_json
-        end
-    end
-end
-```
-
 
 
 ## Part 0 - Getting Started
@@ -180,7 +128,7 @@ Make the API endpoints for managing the logged in user's account. Also provide t
 
 
 
-**GET /my_account**
+**GET /api/v1/my_account**
 
 returns JSON representing the currently logged in user
 
@@ -194,7 +142,7 @@ returns 404 if user not found
 
 
 
-**PATCH /my_account**
+**PATCH /api/v1/my_account**
 
 Required Parameters: bio
 
@@ -202,7 +150,7 @@ let people update their bio
 
 
 
-**PATCH /my_account/profile_image**
+**PATCH /api/v1/my_account/profile_image**
 
 Required Parameters: image
 
@@ -264,7 +212,7 @@ Interactivity! Add the ability to view and manage likes.
 
 
 
-**GET /posts/:id/likes**
+**GET /api/v1/posts/:id/likes**
 
 get the likes for the post with the given ID
 
@@ -272,7 +220,7 @@ returns 404 if post not found
 
 
 
-**POST /posts/:id/likes**
+**POST /api/v1/posts/:id/likes**
 
 adds a like to a post, if not already liked
 
@@ -280,7 +228,7 @@ returns 404 if post not found
 
 
 
-**DELETE /posts/:id/likes**
+**DELETE /api/v1/posts/:id/likes**
 
 deletes a like from the post with the given ID, if the like exists
 
@@ -298,7 +246,7 @@ Let the trolling commence. Add the ability for users to comment on each other's 
 
 
 
-**GET /posts/:id/comments**
+**GET /api/v1/posts/:id/comments**
 
 returns JSON representing all the comments for the post with the given ID
 
@@ -306,7 +254,7 @@ returns 404 if post not found
 
 
 
-**POST /posts/:id/comments**
+**POST /api/v1/posts/:id/comments**
 
 Required Parameter: "text"
 
@@ -316,7 +264,7 @@ returns 404 if post not found
 
 
 
-**PATCH /comments/:id**
+**PATCH /api/v1/comments/:id**
 
 Required Parameter: "text"
 
@@ -328,7 +276,7 @@ returns 401 if comment does not belong to current user
 
 
 
-**DELETE /comments/:id**
+**DELETE /api/v1/comments/:id**
 
 Deletes the comment with the given ID
 
